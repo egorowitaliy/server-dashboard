@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+
+DAEMON_ROOT = Path("/opt/server-dashboard/daemon")
+
+if str(DAEMON_ROOT) not in sys.path:
+    sys.path.insert(0, str(DAEMON_ROOT))
+
+from server_dashboard.privileged_probe import main
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

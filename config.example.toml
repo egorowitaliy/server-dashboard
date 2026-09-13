@@ -1,0 +1,82 @@
+schema = 1
+
+[dashboard]
+server_name = "My Server"
+timezone = "UTC"
+
+# Встроенные страницы. Отключённая страница исчезает из меню,
+# а связанные с ней операции становятся недоступны.
+[modules]
+overview = true
+services = false
+docker = false
+fail2ban = false
+system = true
+docs = false
+audit = true
+
+# Состав страницы «Система».
+[system]
+storage = true
+smart = false
+schedule = false
+
+# Внешние расширения устанавливаются отдельно от ядра.
+[extensions]
+root = "/opt/server-dashboard-extensions"
+enabled = []
+
+# Параметры главной страницы.
+[host]
+cpu_temperature_type = "x86_pkg_temp"
+live_refresh_seconds = 5
+
+# Хранилища нужны, если включён system.storage.
+[[storage]]
+id = "system"
+name = "Системный диск"
+path = "/"
+warn_percent = 80
+error_percent = 90
+
+# Пример службы systemd. Раздел нужен только при modules.services = true.
+# [[services]]
+# id = "nginx"
+# name = "Nginx"
+# unit = "nginx.service"
+# mode = "daemon"
+# restart = false
+
+# Docker. Перезапуск разрешается только перечисленным контейнерам.
+# [docker]
+# restart_allow = ["example-container"]
+#
+# [docker.names]
+# example-container = "Пример контейнера"
+
+# Fail2Ban. Снимать блокировки можно только в перечисленных jail.
+# [fail2ban]
+# unban_allow = ["sshd"]
+#
+# [fail2ban.names]
+# sshd = "SSH"
+
+# SMART. Раздел нужен только при system.smart = true.
+# [smart]
+# [[smart.disks]]
+# id = "system-ssd"
+# name = "Системный SSD"
+# path = "/dev/nvme0"
+# type = "nvme"
+
+# Расписание. Dashboard только показывает состояние timer-юнитов.
+# [[schedule]]
+# id = "backup"
+# name = "Резервное копирование"
+# timer = "backup.timer"
+
+# Локальная документация в Markdown. Раздел нужен при modules.docs = true.
+# [docs]
+# path = "/srv/docs"
+# recursive = true
+# extension = ".md"

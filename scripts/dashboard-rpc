@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import json
+import socket
+import sys
+import uuid
+from pathlib import Path
+
+
+SOCKET_PATH = Path("/run/server-dashboard/dashboard.sock")
+
+
+def parse_params(values: list[str]) -> dict[str, object]:
+    params: dict[str, object] = {}
+    for item in values:
+        if "=" not in item:
+            raise ValueError(f"Параметр должен иметь вид key=value: {item!r}")
+        key, value = item.split("=", 1)
+        if not key:
+            raise ValueError("Пустое имя параметра")
+        try:
+            parsed = json.loads(value)
+        except json.JSONDecodeError:
+            parsed = value
+        params[key] = parsed
+    return params
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Server Dashboard Unix socket RPC client",
+    )
+    parser.add_argument("operation")
+    parser.add_argument("--pretty", action="store_true")
+    parser.add_argument(
+        "--param",
+        action="append",
+        default=[],
+        metavar="KEY=VALUE",
+        help="параметр RPC; VALUE может быть JSON",
+    )
+    parser.add_argument("--target")
+    parser.add_argument("--jail")
+    parser.add_argument("--ip")
+    parser.add_argument("--document")
+    args = parser.parse_args()
+
+    try:
+        params = parse_params(args.param)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    # Совместимость со старыми диагностическими командами.
+    for key, value in (
+        ("target", args.target),
+        ("jail", args.jail),
+        ("ip", args.ip),
+        ("document", args.document),
+    ):
+        if value is not None:
+            params[key] = value
+
+    request = {
+        "version": 1,
+        "id": uuid.uuid4().hex,
+        "op": args.operation,
+        "params": params,
+    }
+
+    payload = (
+        json.dumps(request, ensure_ascii=False, separators=(",", ":"))
+        + "\n"
+    ).encode("utf-8")
+
+    client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    client.settimeout(75.0)
+
+    try:
+        client.connect(str(SOCKET_PATH))
+        client.sendall(payload)
+        chunks: list[bytes] = []
+        while True:
+            chunk = client.recv(65536)
+            if not chunk:
+                break
+            chunks.append(chunk)
+            if b"\n" in chunk:
+                break
+    except OSError as exc:
+        print(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False), file=sys.stderr)
+        return 1
+    finally:
+        client.close()
+
+    raw = b"".join(chunks).partition(b"\n")[0]
+    try:
+        response = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        print(f"Некорректный ответ daemon: {exc}", file=sys.stderr)
+        return 1
+
+    print(json.dumps(
+        response,
+        ensure_ascii=False,
+        indent=2 if args.pretty else None,
+        separators=None if args.pretty else (",", ":"),
+    ))
+    return 0 if response.get("ok") is True else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

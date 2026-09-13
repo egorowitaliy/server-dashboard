@@ -1,0 +1,47 @@
+[Unit]
+Description=Server Dashboard privileged daemon
+After=local-fs.target
+
+[Service]
+Type=simple
+User=root
+Group=server-dashboard
+
+ExecStart=/usr/bin/python3 -m server_dashboard.daemon
+ExecStartPost=/opt/server-dashboard/scripts/dashboard-wait-ready --timeout 5
+
+WorkingDirectory=/opt/server-dashboard/daemon
+Environment=PYTHONPATH=/opt/server-dashboard/daemon
+Environment=PYTHONUNBUFFERED=1
+Environment=SERVER_DASHBOARD_CONFIG=/etc/server-dashboard/config.toml
+
+RuntimeDirectory=server-dashboard
+RuntimeDirectoryMode=0750
+RuntimeDirectoryPreserve=yes
+
+Restart=on-failure
+RestartSec=2s
+
+TimeoutStartSec=10s
+TimeoutStopSec=10s
+
+UMask=0077
+Nice=5
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+
+LockPersonality=yes
+RestrictSUIDSGID=yes
+
+RestrictAddressFamilies=AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

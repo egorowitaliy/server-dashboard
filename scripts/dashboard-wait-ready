@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import json
+import socket
+import time
+import uuid
+from pathlib import Path
+
+
+SOCKET_PATH = Path("/run/server-dashboard/dashboard.sock")
+
+
+def health_request(timeout: float) -> bool:
+    request = {
+        "version": 1,
+        "id": uuid.uuid4().hex,
+        "op": "health",
+        "params": {},
+    }
+
+    payload = (
+        json.dumps(
+            request,
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+
+    client = socket.socket(
+        socket.AF_UNIX,
+        socket.SOCK_STREAM,
+    )
+
+    client.settimeout(timeout)
+
+    try:
+        client.connect(str(SOCKET_PATH))
+        client.sendall(payload)
+
+        chunks: list[bytes] = []
+
+        while True:
+            chunk = client.recv(4096)
+
+            if not chunk:
+                break
+
+            chunks.append(chunk)
+
+            if b"\n" in chunk:
+                break
+
+        raw = b"".join(chunks).partition(b"\n")[0]
+
+        response = json.loads(
+            raw.decode("utf-8")
+        )
+
+        return (
+            response.get("ok") is True
+            and response.get("data", {}).get("status") == "ok"
+        )
+
+    except (
+        OSError,
+        UnicodeDecodeError,
+        json.JSONDecodeError,
+    ):
+        return False
+
+    finally:
+        client.close()
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Wait for Server Dashboard daemon readiness",
+    )
+
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=5.0,
+    )
+
+    parser.add_argument(
+        "--interval",
+        type=float,
+        default=0.05,
+    )
+
+    args = parser.parse_args()
+
+    deadline = time.monotonic() + args.timeout
+
+    while time.monotonic() < deadline:
+        if SOCKET_PATH.is_socket():
+            if health_request(
+                timeout=min(0.5, args.timeout)
+            ):
+                print(
+                    "server-dashboard daemon ready",
+                    flush=True,
+                )
+                return 0
+
+        time.sleep(args.interval)
+
+    print(
+        "server-dashboard daemon readiness timeout",
+        flush=True,
+    )
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

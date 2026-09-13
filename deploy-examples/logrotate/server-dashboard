@@ -1,0 +1,35 @@
+/var/log/server-dashboard/access.log /var/log/server-dashboard/nginx-error.log {
+    daily
+    rotate 14
+    missingok
+    notifempty
+    compress
+    delaycompress
+    sharedscripts
+    create 0640 www-data adm
+    postrotate
+        if [ -s /run/nginx.pid ]; then
+            kill -USR1 "$(cat /run/nginx.pid)" 2>/dev/null || true
+        fi
+    endscript
+}
+
+/var/log/server-dashboard/audit.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    delaycompress
+    create 0640 server-dashboard-web server-dashboard-web
+}
+
+/var/log/server-dashboard/php-error.log {
+    daily
+    rotate 14
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+}

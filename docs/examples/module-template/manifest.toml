@@ -1,0 +1,14 @@
+api = 1
+id = "example-status"
+name = "Пример состояния"
+version = "1.0.0"
+icon = "activity"
+order = 100
+page = false
+placements = ["system"]
+
+[backend]
+entrypoint = "backend.py"
+
+[assets]
+js = "module.js"
