@@ -1,0 +1,16 @@
+/*
+ * Все специфичные стили extension должны жить здесь,
+ * а не в core app.css.
+ *
+ * Префикс CSS-классов должен быть связан с id модуля,
+ * чтобы extension не конфликтовал с core и другими модулями.
+ */
+
+.example-status-panel{
+  min-width:0;
+}
+
+.example-status-note{
+  color:var(--muted);
+  font-size:12px;
+}

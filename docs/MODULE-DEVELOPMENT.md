@@ -19,7 +19,8 @@ my-module/
 ├── backend.py
 ├── config.toml
 └── public/
-    └── module.js
+    ├── module.js
+    └── module.css
 ```
 
 `config.toml` необязателен. CSS также необязателен и нужен только для специфичного содержимого, которому недостаточно штатных компонентов интерфейса.
@@ -78,6 +79,7 @@ placements = ["system"]
 entrypoint = "backend.py"
 
 [assets]
+css = "module.css"
 js = "module.js"
 ```
 
@@ -432,6 +434,67 @@ Dashboard.modules.registerPlacement(
 ## 13. Единый стиль интерфейса
 
 Модуль должен выглядеть как часть Server Dashboard, а не как отдельное приложение, вставленное внутрь страницы.
+
+### Разделение стилей core и extension
+
+`web/public/assets/css/app.css` принадлежит ядру Server Dashboard. Внешний модуль не должен требовать добавления своих CSS-классов, собственных иконок или layout-правил в `app.css`.
+
+Специфичные стили модуля размещаются в:
+
+```text
+<extension>/public/module.css
+```
+
+и объявляются через:
+
+```toml
+[assets]
+css = "module.css"
+js = "module.js"
+```
+
+CSS-классы модуля должны иметь собственное пространство имён. Например, для модуля `my-module`:
+
+```css
+.my-module-panel {
+  min-width: 0;
+}
+
+.my-module-value {
+  font-weight: 600;
+}
+```
+
+Не используйте слишком общие классы вроде:
+
+```text
+.card
+.row
+.item
+.title
+.active
+```
+
+если они не являются штатными классами Dashboard.
+
+Для собственной иконки extension также рекомендуется использовать имя с namespace, например:
+
+```text
+my-module-phone
+```
+
+и определить mapping в `module.css`:
+
+```css
+.i-my-module-phone {
+  --mask: url("phone.svg");
+}
+```
+
+Сам `phone.svg` при этом находится в `public/` этого же extension.
+
+Таким образом, удаление extension должно полностью удалять его JavaScript, CSS и SVG без каких-либо изменений файлов core.
+
 
 ### Используйте штатные компоненты
 

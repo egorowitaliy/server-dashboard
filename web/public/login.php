@@ -279,6 +279,7 @@ button:hover{
     color:#80601d;
 }
 </style>
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg?v=1">
 </head>
 <body>
 <div class="card">

@@ -926,6 +926,41 @@
       )
     );
 
+    const cpuBar =
+      document.getElementById(
+        "live-cpu-bar"
+      );
+
+    if (cpuBar) {
+      const cpuPercent =
+        Math.min(
+          100,
+          Math.max(
+            0,
+            host.cpu.usage_percent
+          )
+        );
+
+      cpuBar.style.width =
+        `${cpuPercent}%`;
+
+      const progress =
+        cpuBar.parentElement;
+
+      if (progress) {
+        progress.classList.toggle(
+          "amber",
+          cpuPercent >= 70
+          && cpuPercent < 90
+        );
+
+        progress.classList.toggle(
+          "red",
+          cpuPercent >= 90
+        );
+      }
+    }
+
     setText(
       "live-memory-value",
       `${bytes(host.memory.used_bytes)} из ${bytes(host.memory.total_bytes)}`
@@ -1351,7 +1386,67 @@
           )
         );
 
-        if (index === 1) {
+        if (index === 0) {
+          const wrap =
+            el(
+              "div",
+              "progress-wrap"
+            );
+
+          const valueNode =
+            el(
+              "div",
+              "value",
+              value
+            );
+
+          valueNode.id =
+            "live-cpu";
+
+          const progress =
+            el(
+              "div",
+              "progress"
+            );
+
+          const bar =
+            el("span");
+
+          bar.id =
+            "live-cpu-bar";
+
+          const cpuPercent =
+            Math.min(
+              100,
+              Math.max(
+                0,
+                host.cpu.usage_percent
+              )
+            );
+
+          bar.style.width =
+            `${cpuPercent}%`;
+
+          if (cpuPercent >= 90) {
+            progress.classList.add(
+              "red"
+            );
+          } else if (cpuPercent >= 70) {
+            progress.classList.add(
+              "amber"
+            );
+          }
+
+          progress.append(bar);
+
+          wrap.append(
+            valueNode,
+            progress
+          );
+
+          row.append(wrap);
+
+        } else if (index === 1) {
           const wrap =
             el(
               "div",
@@ -1399,11 +1494,6 @@
               "value",
               value
             );
-
-          if (index === 0) {
-            valueNode.id =
-              "live-cpu";
-          }
 
           if (index === 2) {
             valueNode.id =

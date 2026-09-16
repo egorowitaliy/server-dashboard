@@ -11,4 +11,5 @@ placements = ["system"]
 entrypoint = "backend.py"
 
 [assets]
+css = "module.css"
 js = "module.js"

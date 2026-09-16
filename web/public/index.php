@@ -36,6 +36,7 @@ $jsVersion = is_file($jsPath) ? (string) filemtime($jsPath) : '1';
 <title><?= h($dashboardIdentity['title']) ?></title>
 <meta name="csrf-token" content="<?= h(Csrf::token()) ?>">
 <link rel="stylesheet" href="/assets/css/app.css?v=<?= h($cssVersion) ?>">
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg?v=1">
 </head>
 <body>
 <div class="app">
@@ -57,7 +58,7 @@ $jsVersion = is_file($jsPath) ? (string) filemtime($jsPath) : '1';
         </button>
 
         <button id="reboot" type="button" class="top-action" hidden>
-            <span class="icon i-power"></span>
+            <span class="icon i-reboot"></span>
             <span>Перезагрузка</span>
         </button>
 

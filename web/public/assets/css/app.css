@@ -52,6 +52,7 @@ button{font:inherit}
 .i-shield{--mask:url("../icons/shield.svg")}
 .i-display{--mask:url("../icons/system.svg")}
 .i-refresh{--mask:url("../icons/refresh.svg")}
+.i-reboot{--mask:url("../icons/reboot.svg")}
 .i-power{--mask:url("../icons/power.svg")}
 .i-person{--mask:url("../icons/user.svg")}
 .i-cpu{--mask:url("../icons/cpu.svg")}
@@ -356,6 +357,10 @@ button{font:inherit}
   display:block;
   background:var(--blue);
   border-radius:inherit;
+}
+
+.progress.amber span{
+  background:var(--amber);
 }
 
 .progress.red span{
@@ -879,7 +884,7 @@ button{font:inherit}
 }
 
 .f2b-detail-row>td{
-  padding:0 !important;
+  padding:0;
   background:#fafbfc;
 }
 
