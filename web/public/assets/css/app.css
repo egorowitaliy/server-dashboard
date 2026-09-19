@@ -718,17 +718,34 @@ button{font:inherit}
   }
 
   .topbar{
-    height:60px;
-    padding:0 13px;
+    height:50px;
+    padding:0 8px;
+    gap:6px;
+  }
+
+  .brand-wrap{
+    min-width:0;
+    flex:1 1 auto;
+    gap:5px;
   }
 
   .brand{
-    font-size:22px;
+    min-width:0;
+    flex-wrap:nowrap;
+    gap:4px;
+    font-size:16px;
+    line-height:1;
+    white-space:nowrap;
+  }
+
+  .brand-part{
+    flex:0 0 auto;
+    white-space:nowrap;
   }
 
   .sidebar{
     position:fixed;
-    top:60px;
+    top:50px;
     bottom:0;
     left:0;
     height:auto;
@@ -763,14 +780,50 @@ button{font:inherit}
 
   .mobile-menu{
     display:grid;
+    width:30px;
+    min-width:30px;
+    height:34px;
+    padding:0 5px;
+    flex:0 0 30px;
+    place-items:center;
   }
 
-  .top-action span:last-child{
+  .top-actions{
+    flex:0 0 auto;
+    gap:0;
+    white-space:nowrap;
+  }
+
+  .top-action{
+    width:30px;
+    min-width:30px;
+    height:34px;
+    padding:0 5px;
+    justify-content:center;
+    gap:0;
+  }
+
+  .top-action .icon{
+    width:16px;
+    height:16px;
+  }
+
+  .top-actions .top-action span:last-child{
     display:none;
   }
 
   .top-divider{
     display:none;
+  }
+
+  .user{
+    padding:5px;
+    gap:0;
+  }
+
+  .user .icon{
+    width:17px;
+    height:17px;
   }
 
   .user span:last-child{
@@ -829,6 +882,45 @@ button{font:inherit}
   .table td{
     padding-left:13px;
     padding-right:13px;
+  }
+}
+
+@media(max-width:390px){
+  .topbar{
+    padding-left:6px;
+    padding-right:6px;
+    gap:3px;
+  }
+
+  .brand-wrap{
+    gap:3px;
+  }
+
+  .brand{
+    font-size:15px;
+    gap:3px;
+  }
+
+  .mobile-menu,
+  .top-action{
+    width:28px;
+    min-width:28px;
+    padding-left:4px;
+    padding-right:4px;
+  }
+
+  .top-action .icon{
+    width:15px;
+    height:15px;
+  }
+
+  .user{
+    padding:4px;
+  }
+
+  .user .icon{
+    width:16px;
+    height:16px;
   }
 }
 
